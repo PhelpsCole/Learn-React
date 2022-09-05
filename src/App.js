@@ -21,31 +21,36 @@ function App() {
             {id: 4, title: "Rust", body: "C++ - лучший язык программирования"},
         ])
     const [title, setTytle] = useState('')
-    const bodyInputRef = useRef()
+    const [body, setBody] = useState('')
     const addNewPost = (e) => {
         e.preventDefault()
-        console.log(title)
-        console.log(bodyInputRef.current.value)
+        const newPost = {
+            id: Date.now(),
+            title,
+            body
+        }
+        setPosts([...posts, newPost])
+        setTytle('')
+        setBody('')
     }
     return (
         <div className="App">
             <form>
-                {/*Управляемый компонент*/}
                 <MyInput
                     value={title}
                     onChange = {e => setTytle(e.target.value)}
                     type="text"
                     placeholder="Название поста"
                 />
-                {/*Неуправляемый компонент*/}
                 <MyInput
-                    ref={bodyInputRef}
+                    value={body}
+                    onChange = {e => setBody(e.target.value)}
                     type="text"
                     placeholder="Описание поста"
                 />
                 <MyButton onClick={addNewPost}>Создать пост</MyButton>
             </form>
-            <PostList title="Список постов 2" posts={posts2}/>
+            <PostList title="Список постов" posts={posts}/>
         </div>
     );
 }
