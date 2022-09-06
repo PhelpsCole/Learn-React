@@ -4,53 +4,57 @@ import Counter from "./components/Counter";
 import ClassCounter from "./components/ClassCounter";
 import PostItem from "./components/PostItem";
 import PostList from "./components/PostList";
+import PostForm from "./components/PostForm";
 import MyButton from "./components/UI/button/MyButton";
 import MyInput from "./components/UI/input/MyInput";
+import MySelect from "./components/UI/select/MySelect";
 import './styles/App.css';
 
 function App() {
-        const [posts, setPosts] = useState([
-            {id: 1, title: "JavaScript", body: "JavaScript - язык программирования"},
-            {id: 2, title: "Python", body: "Python - язык программирования"},
-            {id: 3, title: "C++", body: "C++ - лучший язык программирования"},
-        ])
-        const [posts2, setPosts2] = useState([
-            {id: 1, title: "Ruby", body: "Ruby - язык программирования"},
-            {id: 2, title: "Java", body: "Python - язык программирования"},
-            {id: 3, title: "Go", body: "Go - лучший язык программирования"},
-            {id: 4, title: "Rust", body: "C++ - лучший язык программирования"},
-        ])
-    const [title, setTytle] = useState('')
-    const [body, setBody] = useState('')
-    const addNewPost = (e) => {
-        e.preventDefault()
-        const newPost = {
-            id: Date.now(),
-            title,
-            body
-        }
+    const [posts, setPosts] = useState([
+        {id: 1, title: "JavaScript", body: "язык программирования"},
+        {id: 2, title: "Python", body: "Python - язык программирования"},
+        {id: 3, title: "C++", body: "C++ - лучший язык программирования"},
+    ])
+    const [selectedSort, setSelectedSort] = useState('')
+
+    const createPost = (newPost) => {
         setPosts([...posts, newPost])
-        setTytle('')
-        setBody('')
     }
+
+    const removePost = (post) => {
+        setPosts(posts.filter(p => p.id !== post.id))
+    }
+
+    const sortPosts = (sort) => {
+        setSelectedSort(sort);
+        setPosts([...posts].sort((a, b) => a[sort].localeCompare(b[sort])))
+    }
+
     return (
         <div className="App">
-            <form>
-                <MyInput
-                    value={title}
-                    onChange = {e => setTytle(e.target.value)}
-                    type="text"
-                    placeholder="Название поста"
+            <PostForm create={createPost}/>
+            <hr style={{margin: '15px 0'}}/>
+            <div>
+                <MySelect
+                    value={selectedSort}
+                    onChange={sortPosts}
+                    defaultValue="Сортировка по"
+                    option={[
+                        {value: 'title', name: "По названию"},
+                        {value: 'body', name: "По описанию"}
+                    ]}
                 />
-                <MyInput
-                    value={body}
-                    onChange = {e => setBody(e.target.value)}
-                    type="text"
-                    placeholder="Описание поста"
-                />
-                <MyButton onClick={addNewPost}>Создать пост</MyButton>
-            </form>
-            <PostList title="Список постов" posts={posts}/>
+            </div>
+            {posts.length != 0
+                ?
+                <PostList remove={removePost} title="Список постов" posts={posts}/>
+                :
+                <h1 style={{textAlign: 'center'}}>
+                    Посты не были найдены
+                </h1>
+            }
+            
         </div>
     );
 }
