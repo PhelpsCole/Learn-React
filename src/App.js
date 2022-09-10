@@ -1,5 +1,8 @@
-import React, {useState, useRef, useMemo} from 'react';
+import React, {useState, useRef, useMemo, useEffect} from 'react';
 import {usePosts} from './hooks/usePosts'
+import {useFetching} from './hooks/useFetching'
+import {getPagesCount, getPagesArray} from './utils/pages'
+import PostService from './API/PostService'
 import Counter from "./components/Counter";
 import ClassCounter from "./components/ClassCounter";
 import PostItem from "./components/PostItem";
@@ -10,17 +13,30 @@ import MyButton from "./components/UI/button/MyButton";
 import MyInput from "./components/UI/input/MyInput";
 import MySelect from "./components/UI/select/MySelect";
 import MyModal from "./components/UI/MyModal/MyModal";
+import Loader from "./components/UI/loader/loader";
 import './styles/App.css';
 
 function App() {
-    const [posts, setPosts] = useState([
-        {id: 1, title: "JavaScript", body: "язык программирования"},
-        {id: 2, title: "Python", body: "Python - язык программирования"},
-        {id: 3, title: "C++", body: "C++ - лучший язык программирования"},
-    ])
+    const [posts, setPosts] = useState([])
     const [filter, setFilter] = useState({sort: '', query: ''});
     const [modal, setModal] = useState(false);
+    const [totalPages, setTotalPages] = useState(0);
+    const [limit, setLimit] = useState(10);
+    const [page, setPage] = useState(1);
     const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query);
+
+    let pagesArray = getPagesArray(totalPages)
+
+    const [fetchPosts, isPostsLoading, postError] = useFetching(async () => {
+        const response = await PostService.getAll(limit, page);
+        setPosts(response.data);
+        const totalCount = response.headers['x-total-count']
+        setTotalPages(getPagesCount(totalCount, limit));
+    })
+
+    useEffect(() => {
+        fetchPosts()
+    }, [])
     
     const createPost = (newPost) => {
         setPosts([...posts, newPost])
@@ -44,7 +60,24 @@ function App() {
                 filter={filter}
                 setFilter={setFilter}
             />
-            <PostList remove={removePost} title="Список постов" posts={sortedAndSearchedPosts}/>
+            {postError &&
+                <h1>Произошла ошибка ${postError}</h1>
+            }
+            {isPostsLoading
+                ? <div style={{display: 'flex', justifyContent: "center", marginTop: 50}}><Loader/></div>
+                : <PostList remove={removePost} title="Список постов" posts={sortedAndSearchedPosts}/>
+            }
+            <div className="page__wrapper">
+                {pagesArray.map(p => 
+                    <span 
+                        onClick={() => setPage(p)}
+                        key={p} 
+                        className={page === p ? "page page_current" : "page"}
+                    >
+                        {p}
+                    </span>
+                )}
+            </div>
         </div>
     );
 }
