@@ -1,9 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import {usePosts} from './hooks/usePosts'
-import {useFetching} from './hooks/useFetching'
-import {usePagination} from './hooks/usePagination'
-import {getPagesCount} from './utils/pages'
-import PostService from './API/PostService'
+import {usePosts} from './hooks/usePosts';
+import {useFetching} from './hooks/useFetching';
+import {getPagesCount} from './utils/pages';
+import PostService from './API/PostService';
 import PostList from "./components/PostList";
 import PostForm from "./components/PostForm";
 import PostFilter from "./components/PostFilter";
