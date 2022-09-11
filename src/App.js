@@ -1,17 +1,13 @@
-import React, {useState, useRef, useMemo, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {usePosts} from './hooks/usePosts'
 import {useFetching} from './hooks/useFetching'
-import {getPagesCount, getPagesArray} from './utils/pages'
+import {usePagination} from './hooks/usePagination'
+import {getPagesCount} from './utils/pages'
 import PostService from './API/PostService'
-import Counter from "./components/Counter";
-import ClassCounter from "./components/ClassCounter";
-import PostItem from "./components/PostItem";
 import PostList from "./components/PostList";
 import PostForm from "./components/PostForm";
 import PostFilter from "./components/PostFilter";
 import MyButton from "./components/UI/button/MyButton";
-import MyInput from "./components/UI/input/MyInput";
-import MySelect from "./components/UI/select/MySelect";
 import MyModal from "./components/UI/MyModal/MyModal";
 import Loader from "./components/UI/loader/loader";
 import './styles/App.css';
@@ -25,7 +21,7 @@ function App() {
     const [page, setPage] = useState(1);
     const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query);
 
-    let pagesArray = getPagesArray(totalPages)
+    let pagesArray = usePagination(totalPages)
 
     const [fetchPosts, isPostsLoading, postError] = useFetching(async () => {
         const response = await PostService.getAll(limit, page);
